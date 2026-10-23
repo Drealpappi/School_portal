@@ -59,3 +59,46 @@ class ClassLevel(TimeStampedUUIDModel):
 
     def __str__(self):
         return self.name
+
+
+class ClassRoom(TimeStampedUUIDModel):
+    level = models.ForeignKey(ClassLevel, on_delete=models.CASCADE, related_name='classroom')
+    arm = models.CharField(max_length=25, help_text="e.g., A, N1, P1, Science")
+    capacity = models.PositiveSmallIntegerField(default=50)
+    form_teacher = models.ForeignKey('staff.StaffProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='class_manager')
+
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(fields=['level', 'arm'], name='unique_level_arm')
+        ]
+
+        
+        ordering = ['level__level__order', 'arm']
+
+    def __str__(self):
+        return f"{self.level.name} {self.arm}"
+
+class Subject(TimeStampedUUIDModel):
+    name = models.CharField(max_length=60, unique=True)
+    subject_code = models.CharField(max_length=15, unique=True, help_text="e.g., MATH, PHE, ENG, PHY, CHM")
+    is_core = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} {self.subject_code}"
+
+class SubjectAllocation(TimeStampedUUIDModel):
+    teacher = models.ForeignKey('staff.StaffProfile', on_delete=models.CASCADE, related_name='allocations')
+    Subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='allocations')
+    class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, related_name='subject_allocations')
+    session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE, related_name='subject_allocations')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['subject', 'class_room', 'session'], name='unique_subject_classroom_session_allocation')
+        ]
+
+    def __str__(self):
+        return f"{self.subject_code} - {self.class_room} ({self.teacher.user.full_name})"

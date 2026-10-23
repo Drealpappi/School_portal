@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth import AbstractBaseUser, PermissionMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from core.models import TimeStampedUUIDModel
-from .managers import CustomerUserManager
+from .managers import CustomUserManager
 
 # Create your models here.
-class User(AbstractBaseUser, PermissionMixin, TimeStampedUUIDModel):
+class User(AbstractBaseUser, PermissionsMixin, TimeStampedUUIDModel):
     class Role(models.TextChoices):
         SUPERADMIN = 'SUPERADMIN', 'Super Admin'
         ADMIN = 'ADMIN', 'School Admin'
@@ -23,7 +23,7 @@ class User(AbstractBaseUser, PermissionMixin, TimeStampedUUIDModel):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    objects = CustomerUserManager()
+    objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELD = ['first_name', 'last_name']
