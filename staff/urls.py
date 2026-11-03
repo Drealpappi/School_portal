@@ -5,6 +5,6 @@ from .views import StaffViewSet
 router=DefaultRouter()
 router.register('', StaffViewSet, basename='staff')
 
-urls_patterns = [
+urlpatterns = [
     path('', include(router.urls)),
 ]

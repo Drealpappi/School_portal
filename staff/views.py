@@ -5,7 +5,7 @@ from .models import StaffProfile
 from .serializers import StaffProfileReadSerializer, StaffCreateSerializer
 
 # Create your views here.
-class StaffViewSet(viewsets.ModelviewSet):
+class StaffViewSet(viewsets.ModelViewSet):
     queryset = StaffProfile.objects.select_related('user').all()
 
     def get_permissions(self):

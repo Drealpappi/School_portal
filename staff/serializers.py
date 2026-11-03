@@ -15,7 +15,7 @@ class StaffCreateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     first_name = serializers.CharField(max_length=40, write_only=True)
     last_name = serializers.CharField(max_length=40, write_only=True)
-    phone_number = serializers.CharField(max_length=15, required=False, blank=True, write_only=True)
+    phone_number = serializers.CharField(max_length=15, required=False, allow_blank=True, write_only=True)
     role = serializers.ChoiceField(choices=[User.Role.TEACHER, User.Role.ACCOUNTANT, User.Role.ADMIN], default=User.Role.TEACHER, write_only=True)
 
     password = serializers.CharField(min_length=8, required=False, write_only=True)
@@ -27,7 +27,7 @@ class StaffCreateSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("A user with this email already exist.")
-            return value
+        return value
 
     @transaction.atomic
     def create(self, validated_data):

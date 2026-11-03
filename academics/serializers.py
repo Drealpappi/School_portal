@@ -20,7 +20,7 @@ class ClassLevelSerializer(serializers.ModelSerializer):
 
 class ClassRoomSerializer(serializers.ModelSerializer):
     level_name = serializers.CharField(source='level.name', read_only=True)
-    form_teacher_name = serializers.CharFields(source='form_teacher.user.full_name', read_only=True)
+    form_teacher_name = serializers.CharField(source='form_teacher.user.full_name', read_only=True)
     full_name = serializers.SerializerMethodField()
 
     class Meta:

@@ -21,16 +21,16 @@ class AcademicSession(TimeStampedUUIDModel):
         return self.name
 
 class Term(TimeStampedUUIDModel):
-    class TermChoice(models.TextChoice):
+    class TermChoice(models.TextChoices):
         FIRST = 'FIRST', 'First Term'
         SECOND = 'SECOND', 'Second Term'
         THIRD = 'THIRD', 'Third Term'
 
-    session = models.ForeignKey(AcademicSession, on_dete=models.CASCADE, related_name='terms')
-    namee = models.CharField(max_length=25, choices=TermChoice.choices)
+    session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE, related_name='terms')
+    name = models.CharField(max_length=25, choices=TermChoice.choices)
     start_date = models.DateField()
     end_date = models.DateField()
-    is_current = models.BoleanField(default=False)
+    is_current = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
@@ -52,10 +52,10 @@ class Term(TimeStampedUUIDModel):
 
 class ClassLevel(TimeStampedUUIDModel):
     name = models.CharField(max_length=30, unique=True, help_text="e.g., JSS 1, JSS 2, JSS3, Nusery 1")
-    level_order = models.PositiveSmallIntergerField(unique=True, help_text="e.g., It used for automatic promotion (1 for JSS 1, 2 for JSS 2)")
+    level_order = models.PositiveSmallIntegerField(unique=True, help_text="e.g., It used for automatic promotion (1 for JSS 1, 2 for JSS 2)")
 
     class Meta:
-        ordering = ['lever_oder']
+        ordering = ['level_order']
 
     def __str__(self):
         return self.name
@@ -73,7 +73,7 @@ class ClassRoom(TimeStampedUUIDModel):
         ]
 
         
-        ordering = ['level__level__order', 'arm']
+        ordering = ['level__level_order', 'arm']
 
     def __str__(self):
         return f"{self.level.name} {self.arm}"
@@ -91,13 +91,17 @@ class Subject(TimeStampedUUIDModel):
 
 class SubjectAllocation(TimeStampedUUIDModel):
     teacher = models.ForeignKey('staff.StaffProfile', on_delete=models.CASCADE, related_name='allocations')
-    Subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='allocations')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='allocations')
     class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, related_name='subject_allocations')
     session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE, related_name='subject_allocations')
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['subject', 'class_room', 'session'], name='unique_subject_classroom_session_allocation')
+            models.UniqueConstraint(
+                fields=['subject', 'class_room', 'session'],
+                                    
+                name='unique_subject_classroom_session_allocation'
+            )
         ]
 
     def __str__(self):
